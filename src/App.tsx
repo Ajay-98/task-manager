@@ -12,7 +12,7 @@ type Action =
       | { type : 'DELETE_TODOS', payload : number}
       | { type : 'TOGGLE_TODOS', payload : number}
 
-function todoreducer( state:Todo[], action:Action): Todo[] {
+export function todoreducer( state:Todo[], action:Action): Todo[] {
   switch(action.type)
   {
     case 'ADD_TODOS':
@@ -86,7 +86,20 @@ function App() {
         { todos.map(
           (todo:Todo) => (
             <li key= {todo.id}>
+              <input 
+                  type="checkbox"
+                  checked={todo.completed}
+                  onChange={() => dispatch({type : 'TOGGLE_TODOS', payload:todo.id })}
+              />
             {todo.text} ---- {todo.completed === false && 'Not Completed'}
+              <button
+              onClick={
+                () => dispatch({
+                  type : 'DELETE_TODOS', payload : todo.id
+                })
+              }>
+                Delete
+              </button>
           </li>
           )
         )
