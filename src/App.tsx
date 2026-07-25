@@ -1,14 +1,13 @@
 import { useEffect, useReducer, useState } from 'react'
-import useLocalStorage from './localStorage'
 
 interface Todo{
   id: number;
   text: string;
-  completed: Boolean;
+  completed: boolean;
 }
 
 type Action = 
-      | { type : 'SET_TODOS', payload : Todo[]}
+      | { type : 'ADD_TODOS', payload : Todo[]}
       | { type : 'GET_TODOS', payload : Todo}
       | { type : 'DELETE_TODOS', payload : number}
       | { type : 'TOGGLE_TODOS', payload : number}
@@ -16,13 +15,13 @@ type Action =
 function todoreducer( state:Todo[], action:Action): Todo[] {
   switch(action.type)
   {
-    case 'SET_TODOS':
+    case 'ADD_TODOS':
       return action.payload;
     case 'GET_TODOS':
       return [...state, action.payload];
     case 'DELETE_TODOS':
       return state.filter(
-        (todo) => todo.id != action.payload
+        (todo) => todo.id !== action.payload
       );
     case 'TOGGLE_TODOS':
       return state.map(
@@ -50,7 +49,7 @@ function App() {
       fetch('http://localhost:3001/tasks')
       .then((res) => res.json())
       .then((data:Todo[]) => {
-        dispatch({ type: 'SET_TODOS', payload: data })
+        dispatch({ type: 'ADD_TODOS', payload: data })
         setLoading(false);}
   ).catch(
     (err) => {
@@ -65,7 +64,7 @@ function App() {
   function addTodo()
   {
     if (!input.trim()) return;
-    dispatch({ type: 'GET_TODOS', payload: });
+    dispatch({ type: 'GET_TODOS', payload: { text:input, id: Date.now(), completed: false }});
     setInput('');
   }
 
