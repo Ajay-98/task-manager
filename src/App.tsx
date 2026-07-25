@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import useLocalStorage from './localStorage'
 
 interface Todo{
@@ -7,11 +7,40 @@ interface Todo{
   completed: Boolean;
 }
 
+type Action = 
+      | { type : 'SET_TODOS', payload : Todo[]}
+      | { type : 'GET_TODOS', payload : Todo}
+      | { type : 'DELETE_TODOS', payload : number}
+      | { type : 'TOGGLE_TODOS', payload : number}
+
+function todoreducer( state:Todo[], action:Action): Todo[] {
+  switch(action.type)
+  {
+    case 'SET_TODOS':
+      return action.payload;
+    case 'GET_TODOS':
+      return [...state, action.payload];
+    case 'DELETE_TODOS':
+      return state.filter(
+        (todo) => todo.id != action.payload
+      );
+    case 'TOGGLE_TODOS':
+      return state.map(
+        (todo) => todo.id === action.payload ? {
+          ...todo, completed: !todo.completed
+        } :todo
+      );
+      default:
+        return state; 
+  }
+
+}
+
 function App() {
   
   // input flag is to check if user clikced the Add button with blank and " " in the input box. 
   const [input, setInput] = useState('');
-  const [todos, setTodos] = useState<Todo[]>([]); 
+  const [todos, dispatch] = useReducer(todoreducer, []);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,7 +50,7 @@ function App() {
       fetch('http://localhost:3001/tasks')
       .then((res) => res.json())
       .then((data:Todo[]) => {
-        setTodos(data);
+        dispatch({ type: 'SET_TODOS', payload: data })
         setLoading(false);}
   ).catch(
     (err) => {
@@ -36,7 +65,7 @@ function App() {
   function addTodo()
   {
     if (!input.trim()) return;
-    setTodos([...todos, {text :input, id :Date.now(), completed :false}]);
+    dispatch({ type: 'GET_TODOS', payload: });
     setInput('');
   }
 
